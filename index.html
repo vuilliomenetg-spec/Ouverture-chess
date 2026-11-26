@@ -3,61 +3,111 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F1EFE8">
+<meta name="theme-color" content="#1b2420">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Ouvertures d'échecs</title>
 <style>
-:root{--bg:#fff;--tx:#1f1f1e;--tx2:#5f5e5a;--bd:#d3d1c7;--ac:#185FA5;--acbg:#E6F1FB;--ok:#3B6D11;--cell:calc(min(94vw,440px)/8)}
-@media(prefers-color-scheme:dark){:root{--bg:#1f1f1e;--tx:#efeee9;--tx2:#b4b2a9;--bd:#444441;--ac:#85B7EB;--acbg:#042C53;--ok:#97C459}}
-*{box-sizing:border-box}
-body{margin:0;padding:12px 3vw 40px;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;max-width:900px;margin-inline:auto}
-h1{font-size:20px;font-weight:500;margin:4px 0 12px}
-button{font:inherit;font-size:14px;color:var(--tx);background:transparent;border:0.5px solid var(--bd);border-radius:8px;padding:8px 12px;cursor:pointer}
-button.on{border:1.5px solid var(--ac);background:var(--acbg);color:var(--ac)}
-.row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
-.gl{font-size:12px;color:var(--tx2);margin:0 0 6px}
-.bd{display:grid;grid-template-columns:repeat(8,var(--cell));grid-template-rows:repeat(8,var(--cell));border:0.5px solid var(--bd);width:calc(var(--cell)*8);touch-action:manipulation}
-.sq{position:relative;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cell)*0.78);line-height:1;user-select:none;-webkit-user-select:none}
-.l{background:#F1EFE8}.d{background:#B4B2A9}.hl{background:#FAC775}
-.sel{box-shadow:inset 0 0 0 3px #378ADD}.hint{box-shadow:inset 0 0 0 3px #1D9E75}
-.pw{color:#fff;-webkit-text-stroke:1px #2C2C2A}.pb{color:#2C2C2A;-webkit-text-stroke:0.5px #2C2C2A}
-.cn{position:absolute;font-size:10px;line-height:1;color:#444441;-webkit-text-stroke:0}
-.mv{padding:2px 5px;border-radius:4px;font-size:14px;display:inline-block}
-.mv.cl{cursor:pointer}.mv.on{background:var(--acbg);color:var(--ac);font-weight:500}
-.wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-top:10px}
-.side{flex:1;min-width:250px}
-#cap{min-height:110px;font-size:16px}
-#info{font-size:13px;color:var(--tx2)}
+html{background:#1b2420}
+:root{--cell:calc(min(90vw,460px)/8);--gold:#E8C468;--ink:#efeee9;--mute:#aab5ae;--panel:rgba(18,26,22,.84)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5;min-height:100vh;padding:max(14px,env(safe-area-inset-top)) 14px 44px}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 0%,rgba(0,0,0,0) 0%,rgba(0,0,0,.6) 100%),conic-gradient(#2a3a32 25%,#1b2621 0 50%,#2a3a32 0 75%,#1b2621 0) 0 0/88px 88px}
+.app{max-width:960px;margin:0 auto}
+header{text-align:center;margin:6px 0 16px}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:.3px}
+h1 span{color:var(--gold)}
+.sub{margin:2px 0 0;font-size:14px;color:var(--mute)}
+.modes{display:flex;gap:12px;margin:0 0 14px}
+.mode{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;font:inherit;font-size:17px;font-weight:700;color:var(--gold);background:rgba(18,26,22,.7);border:2px solid var(--gold);border-radius:999px;padding:14px 12px;cursor:pointer;transition:transform .12s,background .12s}
+.mode i{font-style:normal;font-size:24px;line-height:1}
+.mode:active{transform:scale(.97)}
+.mode.on{background:var(--gold);color:#2a2210;box-shadow:0 6px 18px rgba(232,196,104,.3)}
+.card{background:var(--panel);border:1px solid rgba(232,196,104,.2);border-radius:24px;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.gl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);margin:0 0 8px;text-transform:uppercase;letter-spacing:.8px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:2px solid #8a948e}
+.dot.w{background:#F1EFE8}.dot.b{background:#14181a}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.chips:last-of-type{margin-bottom:0}
+.chip{font:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:9px 16px;border:2px solid transparent;cursor:pointer;transition:transform .12s}
+.chip:active{transform:scale(.96)}
+.chip.w{background:#F1EFE8;color:#1f1f1e}
+.chip.b{background:#2d3732;color:#F1EFE8;border-color:#55625a}
+.chip.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,196,104,.4)}
+#info{margin:14px 4px 12px;font-size:14px;color:var(--mute);text-align:center;min-height:21px}
+.stage{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+.frame{padding:10px;border-radius:20px;background:linear-gradient(145deg,#5b4330,#33241a);box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.bd{display:grid;grid-template-columns:repeat(8,var(--cell));grid-template-rows:repeat(8,var(--cell));width:calc(var(--cell)*8);border-radius:10px;overflow:hidden;touch-action:manipulation}
+.sq{position:relative;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cell)*.8);line-height:1;user-select:none;-webkit-user-select:none}
+.l{background:#EEEED2}.d{background:#769656}
+.l.hl{background:#F6F669}.d.hl{background:#BACA2B}
+.sel{box-shadow:inset 0 0 0 4px #3b8fe0}.hint{box-shadow:inset 0 0 0 4px #e0443b}
+.pw{color:#fff;-webkit-text-stroke:1.2px #222;paint-order:stroke fill}
+.pb{color:#1c1c1c;-webkit-text-stroke:.6px #000}
+.cn{position:absolute;font-size:10px;font-weight:700;line-height:1;opacity:.75;-webkit-text-stroke:0}
+.l .cn{color:#5b7a3d}.d .cn{color:#EEEED2}
+.side{flex:1;min-width:260px;max-width:460px}
+#cap{min-height:104px;font-size:16px}
+#cap b{color:var(--gold)}
+.ok{color:#8fd16a;font-weight:700}
+.ctr{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px 0}
+.rb{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#2d3732;color:var(--ink);border:2px solid #55625a;cursor:pointer;padding:0;transition:transform .12s}
+.rb:active{transform:scale(.92)}
+.rb svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.rb.main{width:68px;height:68px;background:var(--gold);color:#2a2210;border-color:var(--gold);box-shadow:0 6px 16px rgba(232,196,104,.3)}
+.rb.main svg{width:32px;height:32px}
+.pill{font:inherit;font-size:16px;font-weight:700;color:#2a2210;background:var(--gold);border:0;border-radius:999px;padding:0 24px;height:56px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.pill svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pill:active{transform:scale(.96)}
+#ml{line-height:2.1;text-align:center}
+.mv{display:inline-block;padding:1px 9px;margin:1px;border-radius:999px;font-size:14px;background:rgba(255,255,255,.07)}
+.mv.cl{cursor:pointer}
+.mv.on{background:var(--gold);color:#2a2210;font-weight:700}
 </style>
 </head>
 <body>
-<h1>Ouvertures d'échecs</h1>
-<p class="gl">Avec les Blancs</p><div id="cw" class="row"></div>
-<p class="gl">Avec les Noirs</p><div id="cb" class="row"></div>
-<div class="row" style="align-items:center">
-<button id="m-learn" class="on" onclick="setMode('learn')">Apprendre</button>
-<button id="m-train" onclick="setMode('train')">S'entraîner</button>
+<div class="app">
+<header>
+<h1><span>♞&#xFE0E;</span> Ouvertures d'échecs</h1>
+<p class="sub">12 ouvertures et gambits pour apprendre et s'entraîner</p>
+</header>
+
+<div class="modes">
+<button class="mode on" id="m-learn" onclick="setMode('learn')"><i>♟&#xFE0E;</i> Apprendre</button>
+<button class="mode" id="m-train" onclick="setMode('train')"><i>♞&#xFE0E;</i> S'entraîner</button>
 </div>
-<div id="info" style="margin-bottom:8px"></div>
-<div class="wrap">
-<div id="board" class="bd"></div>
-<div class="side">
+
+<div class="card">
+<p class="gl"><span class="dot w"></span>Avec les Blancs</p>
+<div id="cw" class="chips"></div>
+<p class="gl"><span class="dot b"></span>Avec les Noirs</p>
+<div id="cb" class="chips"></div>
+</div>
+
+<div id="info"></div>
+
+<div class="stage">
+<div class="frame"><div id="board" class="bd"></div></div>
+<div class="side card">
 <div id="cap"></div>
-<div id="c-learn" class="row" style="margin-top:8px">
-<button onclick="go(-1)">← Précédent</button><button onclick="go(1)">Suivant →</button><button onclick="jump(0)">↺</button>
+<div id="c-learn" class="ctr">
+<button class="rb" onclick="go(-1)" aria-label="Coup précédent"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+<button class="rb main" onclick="go(1)" aria-label="Coup suivant"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+<button class="rb" onclick="jump(0)" aria-label="Recommencer"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg></button>
 </div>
-<div id="c-train" class="row" style="margin-top:8px;display:none">
-<button onclick="hintGo()">Indice</button><button onclick="restart()">Recommencer</button>
+<div id="c-train" class="ctr" style="display:none">
+<button class="pill" onclick="hintGo()"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Indice</button>
+<button class="rb" onclick="restart()" aria-label="Recommencer"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg></button>
 </div>
-<div id="ml" style="line-height:2"></div>
+<div id="ml"></div>
+</div>
 </div>
 </div>
 <script>
-var G={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
+var G={K:'♚\uFE0E',Q:'♛\uFE0E',R:'♜\uFE0E',B:'♝\uFE0E',N:'♞\uFE0E',P:'♟\uFE0E'};
 function start(){var p={},b='RNBQKBNR',f='abcdefgh';for(var i=0;i<8;i++){p[f[i]+'1']=b[i];p[f[i]+'2']='P';p[f[i]+'7']='p';p[f[i]+'8']=b[i].toLowerCase();}return p;}
 var OPS=[
 {id:'it',n:'Italienne',s:'w',d:"Partie italienne : développer, roquer, solide et simple.",st:[
@@ -152,7 +202,8 @@ var o=O(),r=pos(),f='abcdefgh',h='',flip=o.s==='b',ut=userTurn(),hs=null,hd=null
 if(ut&&hintL>0){var m0=mvs(o.st[idx][1])[0];hs=m0[0];if(hintL>1)hd=m0[1];}
 for(var y=0;y<8;y++){for(var x=0;x<8;x++){
 var fi=flip?7-x:x,ra=flip?y+1:8-y,s=f[fi]+ra;
-var c=r.last.indexOf(s)>=0?'hl':(((fi+ra)%2===0)?'d':'l');
+var c=((fi+ra)%2===0)?'d':'l';
+if(r.last.indexOf(s)>=0)c+=' hl';
 if(s===sel)c+=' sel';else if(s===hs||s===hd)c+=' hint';
 var pc=r.p[s],g='';
 if(pc)g='<span class="'+(pc===pc.toUpperCase()?'pw':'pb')+'">'+G[pc.toUpperCase()]+'</span>';
@@ -164,12 +215,12 @@ $('board').innerHTML=h;
 var n=o.st.length,cap='';
 $('info').textContent=o.d;
 if(mode==='learn'){
-cap=idx===0?'<span style="color:var(--tx2)">Position de départ. Appuie sur Suivant pour jouer le premier coup.'+(flip?' Tu joues les Noirs (en bas).':'')+'</span>':'<b>'+labF(idx-1)+'</b><br>'+o.st[idx-1][2];
+cap=idx===0?'<span style="color:var(--mute)">Position de départ. Appuie sur la flèche pour jouer le premier coup.'+(flip?' Tu joues les Noirs (en bas).':'')+'</span>':'<b>'+labF(idx-1)+'</b><br>'+o.st[idx-1][2];
 }else{
 if(idx>0)cap+='<b>'+labF(idx-1)+'</b> '+o.st[idx-1][2]+'<br>';
-if(idx>=n){cap+='<div style="margin-top:6px;font-weight:500;color:var(--ok)">Ouverture terminée : '+score+' coups trouvés du premier coup sur '+(o.s==='w'?Math.ceil(n/2):Math.floor(n/2))+'.</div>';}
+if(idx>=n){cap+='<div class="ok" style="margin-top:6px">Ouverture terminée : '+score+' coups trouvés du premier coup sur '+(o.s==='w'?Math.ceil(n/2):Math.floor(n/2))+'.</div>';}
 else if(ut){cap+='<div style="margin-top:6px">À toi de jouer : touche la pièce, puis sa case d\'arrivée.</div>';}
-if(msg)cap+='<div style="margin-top:6px;font-size:14px;color:var(--tx2)">'+msg+'</div>';
+if(msg)cap+='<div style="margin-top:6px;font-size:14px;color:var(--mute)">'+msg+'</div>';
 }
 $('cap').innerHTML=cap;
 var m='';
@@ -195,11 +246,11 @@ if(busy){setTimeout(function(){idx++;busy=false;msg='';draw();},700);}
 }
 function hintGo(){if(!userTurn())return;hintL++;if(hintL>=3){msg='Le coup est '+O().st[idx][0]+'.';hintL=2;tries=1;}else{msg='';}draw();}
 function restart(){idx=(mode==='train'&&O().s==='b')?1:0;sel=null;hintL=0;tries=0;score=0;msg='';busy=false;draw();}
-function setMode(m){mode=m;$('m-learn').className=m==='learn'?'on':'';$('m-train').className=m==='train'?'on':'';$('c-learn').style.display=m==='learn'?'flex':'none';$('c-train').style.display=m==='train'?'flex':'none';restart();}
+function setMode(m){mode=m;$('m-learn').className='mode'+(m==='learn'?' on':'');$('m-train').className='mode'+(m==='train'?' on':'');$('c-learn').style.display=m==='learn'?'flex':'none';$('c-train').style.display=m==='train'?'flex':'none';restart();}
 function pick(i){cur=i;restart();chips();}
 function chips(){
 var w='',b='';
-OPS.forEach(function(o,i){var h='<button class="'+(i===cur?'on':'')+'" onclick="pick('+i+')">'+o.n+'</button>';if(o.s==='w')w+=h;else b+=h;});
+OPS.forEach(function(o,i){var h='<button class="chip '+o.s+(i===cur?' on':'')+'" onclick="pick('+i+')">'+o.n+'</button>';if(o.s==='w')w+=h;else b+=h;});
 $('cw').innerHTML=w;$('cb').innerHTML=b;}
 chips();draw();
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
