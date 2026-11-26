@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F1EFE8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ouvertures d'échecs</title>
+<style>
+:root{--bg:#fff;--tx:#1f1f1e;--tx2:#5f5e5a;--bd:#d3d1c7;--ac:#185FA5;--acbg:#E6F1FB;--ok:#3B6D11;--cell:calc(min(94vw,440px)/8)}
+@media(prefers-color-scheme:dark){:root{--bg:#1f1f1e;--tx:#efeee9;--tx2:#b4b2a9;--bd:#444441;--ac:#85B7EB;--acbg:#042C53;--ok:#97C459}}
+*{box-sizing:border-box}
+body{margin:0;padding:12px 3vw 40px;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;max-width:900px;margin-inline:auto}
+h1{font-size:20px;font-weight:500;margin:4px 0 12px}
+button{font:inherit;font-size:14px;color:var(--tx);background:transparent;border:0.5px solid var(--bd);border-radius:8px;padding:8px 12px;cursor:pointer}
+button.on{border:1.5px solid var(--ac);background:var(--acbg);color:var(--ac)}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.gl{font-size:12px;color:var(--tx2);margin:0 0 6px}
+.bd{display:grid;grid-template-columns:repeat(8,var(--cell));grid-template-rows:repeat(8,var(--cell));border:0.5px solid var(--bd);width:calc(var(--cell)*8);touch-action:manipulation}
+.sq{position:relative;display:flex;align-items:center;justify-content:center;font-size:calc(var(--cell)*0.78);line-height:1;user-select:none;-webkit-user-select:none}
+.l{background:#F1EFE8}.d{background:#B4B2A9}.hl{background:#FAC775}
+.sel{box-shadow:inset 0 0 0 3px #378ADD}.hint{box-shadow:inset 0 0 0 3px #1D9E75}
+.pw{color:#fff;-webkit-text-stroke:1px #2C2C2A}.pb{color:#2C2C2A;-webkit-text-stroke:0.5px #2C2C2A}
+.cn{position:absolute;font-size:10px;line-height:1;color:#444441;-webkit-text-stroke:0}
+.mv{padding:2px 5px;border-radius:4px;font-size:14px;display:inline-block}
+.mv.cl{cursor:pointer}.mv.on{background:var(--acbg);color:var(--ac);font-weight:500}
+.wrap{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;margin-top:10px}
+.side{flex:1;min-width:250px}
+#cap{min-height:110px;font-size:16px}
+#info{font-size:13px;color:var(--tx2)}
+</style>
+</head>
+<body>
+<h1>Ouvertures d'échecs</h1>
+<p class="gl">Avec les Blancs</p><div id="cw" class="row"></div>
+<p class="gl">Avec les Noirs</p><div id="cb" class="row"></div>
+<div class="row" style="align-items:center">
+<button id="m-learn" class="on" onclick="setMode('learn')">Apprendre</button>
+<button id="m-train" onclick="setMode('train')">S'entraîner</button>
+</div>
+<div id="info" style="margin-bottom:8px"></div>
+<div class="wrap">
+<div id="board" class="bd"></div>
+<div class="side">
+<div id="cap"></div>
+<div id="c-learn" class="row" style="margin-top:8px">
+<button onclick="go(-1)">← Précédent</button><button onclick="go(1)">Suivant →</button><button onclick="jump(0)">↺</button>
+</div>
+<div id="c-train" class="row" style="margin-top:8px;display:none">
+<button onclick="hintGo()">Indice</button><button onclick="restart()">Recommencer</button>
+</div>
+<div id="ml" style="line-height:2"></div>
+</div>
+</div>
+<script>
+var G={K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟'};
+function start(){var p={},b='RNBQKBNR',f='abcdefgh';for(var i=0;i<8;i++){p[f[i]+'1']=b[i];p[f[i]+'2']='P';p[f[i]+'7']='p';p[f[i]+'8']=b[i].toLowerCase();}return p;}
+var OPS=[
+{id:'it',n:'Italienne',s:'w',d:"Partie italienne : développer, roquer, solide et simple.",st:[
+['e4','e2e4',"Tu occupes le centre et ouvres des lignes pour fou et dame."],['e5','e7e5',''],
+['Cf3','g1f3',"Tu développes un cavalier et attaques e5."],['Cc6','b8c6',"Les Noirs défendent e5."],
+['Fc4','f1c4',"Le fou vise f7, le point faible des Noirs."],['Fc5','f8c5',''],
+['c3','c2c3',"Tu prépares d4 pour un grand centre."],['Cf6','g8f6',''],
+['d3','d2d3',"Version calme : solide, peu de pièges."],['d6','d7d6',''],
+['O-O','e1g1+h1f1',"Petit roque : ton roi est en sécurité."],['O-O','e8g8+h8f8',"Position équilibrée. Plan : Cbd2, Te1, puis d4."]]},
+{id:'rl',n:'Ruy Lopez',s:'w',d:"Ruy Lopez : pression lente sur le centre noir, ouverture de grands maîtres.",st:[
+['e4','e2e4',''],['e5','e7e5',''],['Cf3','g1f3',"Tu attaques e5."],['Cc6','b8c6',"Les Noirs défendent e5."],
+['Fb5','f1b5',"Le fou met la pression sur le cavalier qui défend e5."],['a6','a7a6',''],
+['Fa4','b5a4',"Tu gardes le fou actif en reculant."],['Cf6','g8f6',''],
+['O-O','e1g1+h1f1',"Tu roques d'abord, la sécurité avant tout."],['Fe7','f8e7',''],
+['Te1','f1e1',"La tour soutient le pion e4."],['b5','b7b5',''],
+['Fb3','a4b3',"Le fou garde sa diagonale vers f7."],['d6','d7d6',''],
+['c3','c2c3',"Tu prépares d4."],['O-O','e8g8+h8f8',"Position classique, riche en plans pour les deux camps."]]},
+{id:'lo',n:'Londres',s:'w',d:"Système de Londres : même plan contre presque tout, très facile à retenir.",st:[
+['d4','d2d4',"Tu prends le centre."],['d5','d7d5',''],
+['Ff4','c1f4',"Tu sors le fou AVANT de jouer e3, sinon il reste bloqué."],['Cf6','g8f6',''],
+['e3','e2e3',"Ton fou est protégé et ta structure est solide."],['e6','e7e6',''],
+['Cf3','g1f3',''],['c5','c7c5',''],
+['c3','c2c3',"Triangle de pions c3-d4-e3 : très solide."],['Cc6','b8c6',''],
+['Cbd2','b1d2',"Le cavalier se place sans gêner le fou."],['Fd6','f8d6',"Le fou noir attaque ton fou."],
+['Fg3','f4g3',"Tu gardes ton fou en le repliant."],['O-O','e8g8+h8f8',''],
+['Fd3','f1d3',"Toutes tes pièces sont développées : tu roques ensuite."]]},
+{id:'gd',n:'Gambit dame',s:'w',d:"Gambit dame : tu offres un pion, mais tu le reprends facilement si on le prend.",st:[
+['d4','d2d4',''],['d5','d7d5',''],
+['c4','c2c4',"Gambit dame : tu offres un pion pour dominer le centre."],['e6','e7e6',"Les Noirs refusent et défendent d5."],
+['Cc3','b1c3',"Tu développes et attaques d5."],['Cf6','g8f6',''],
+['Fg5','c1g5',"Tu cloues le cavalier f6, qui défend d5."],['Fe7','f8e7',''],
+['e3','e2e3',"Tu ouvres la route de ton fou f1."],['O-O','e8g8+h8f8',''],
+['Cf3','g1f3',"Tu développes, puis tu roqueras."]]},
+{id:'gr',n:'Gambit du roi',s:'w',d:"Gambit du roi (Muzio) : attaque folle, tu sacrifies même une pièce.",st:[
+['e4','e2e4',''],['e5','e7e5',''],
+['f4','f2f4',"Gambit du roi : tu offres le pion f pour attaquer vite."],['exf4','e5f4',"Les Noirs acceptent le pion."],
+['Cf3','g1f3',"Tu empêches ...Dh4+."],['g5','g7g5',"Les Noirs gardent leur pion en plus."],
+['Fc4','f1c4',"Gambit Muzio : tu vises le point faible f7."],['g4','g5g4',"Le pion attaque ton cavalier."],
+['O-O','e1g1+h1f1',"Tu sacrifies le cavalier ! Roque et attaque."],['gxf3','g4f3',"Les Noirs prennent le cavalier."],
+['Dxf3','d1f3',"Pièce sacrifiée, mais colonne f ouverte et dame sur f7 : grosse initiative."]]},
+{id:'ev',n:'Gambit Évans',s:'w',d:"Gambit Évans : un pion pour de l'avance de développement.",st:[
+['e4','e2e4',''],['e5','e7e5',''],['Cf3','g1f3',''],['Cc6','b8c6',''],
+['Fc4','f1c4',''],['Fc5','f8c5',''],
+['b4','b2b4',"Gambit Évans : tu offres le pion b pour gagner du temps."],['Fxb4','c5b4',"Les Noirs prennent le pion."],
+['c3','c2c3',"Tu attaques le fou et prépares d4."],['Fa5','b4a5',''],
+['d4','d2d4',"Tu construis un grand centre."],['exd4','e5d4',''],
+['O-O','e1g1+h1f1',"Tu roques : plus de pièces développées et un centre fort."]]},
+{id:'ck',n:'Caro-Kann',s:'b',d:"Caro-Kann contre 1.e4 : défense très solide.",st:[
+['e4','e2e4',''],['c6','c7c6',"Le pion c6 prépare d5."],['d4','d2d4',''],['d5','d7d5',"Tu contestes le centre."],
+['Cc3','b1c3',''],['dxe4','d5e4',"Tu captures le pion."],['Cxe4','c3e4',''],
+['Ff5','c8f5',"Idée clé : tu sors le fou AVANT e6."],['Cg3','e4g3',"Le cavalier attaque ton fou."],
+['Fg6','f5g6',"Ton fou reste actif et en sécurité."],['Cf3','g1f3',''],['Cd7','b8d7',"Ensuite : ...e6, ...Cgf6 et le roque."]]},
+{id:'fr',n:'Française',s:'b',d:"Défense française contre 1.e4 : structure solide, contre-attaque en c5.",st:[
+['e4','e2e4',''],['e6','e7e6',"Tu prépares d5 avec une structure solide."],['d4','d2d4',''],['d5','d7d5',"Tu contestes le centre."],
+['Cc3','b1c3',''],['Cf6','g8f6',"Tu attaques le pion e4."],['e5','e4e5',"Les Blancs avancent et attaquent ton cavalier."],
+['Cfd7','f6d7',"Le cavalier recule."],['f4','f2f4',''],['c5','c7c5',"Plan classique : tu attaques le centre blanc."],
+['Cf3','g1f3',''],['Cc6','b8c6',"Pression sur d4."],['Fe3','c1e3','']]},
+{id:'si',n:'Sicilienne',s:'b',d:"Sicilienne (Najdorf) contre 1.e4 : jeu déséquilibré et combatif.",st:[
+['e4','e2e4',''],['c5','c7c5',"Tu ne copies pas : tu crées un déséquilibre."],['Cf3','g1f3',''],
+['d6','d7d6',"Tu prépares ...Cf6."],['d4','d2d4',''],['cxd4','c5d4',''],['Cxd4','f3d4',''],
+['Cf6','g8f6',"Tu attaques e4."],['Cc3','b1c3',''],['a6','a7a6',"Najdorf : tu empêches Cb5 et prépares ...e5."],
+['Fe2','f1e2',''],['e5','e7e5',"Tu prends ta part du centre."],['Cb3','d4b3',''],['Fe7','f8e7',"Position classique."]]},
+{id:'sl',n:'Slave',s:'b',d:"Défense Slave contre 1.d4 / gambit dame : solide, fou libre.",st:[
+['d4','d2d4',''],['d5','d7d5',''],['c4','c2c4',"Gambit dame : les Blancs offrent un pion."],
+['c6','c7c6',"Défense Slave : c6 protège d5 sans bloquer ton fou c8."],['Cf3','g1f3',''],['Cf6','g8f6',''],
+['Cc3','b1c3',''],['dxc4','d5c4',"Tu prends le pion."],['a4','a2a4',"Les Blancs empêchent ...b5."],
+['Ff5','c8f5',"Tu sors le fou avant e6 !"],['e3','e2e3',''],['e6','e7e6',''],
+['Fxc4','f1c4',"Les Blancs reprennent le pion."],['Fb4','f8b4',"Tu développes avec clouage."]]},
+{id:'ki',n:'Indienne du roi',s:'b',d:"Indienne du roi contre 1.d4 : tu laisses le centre puis tu attaques.",st:[
+['d4','d2d4',''],['Cf6','g8f6',''],['c4','c2c4',''],['g6','g7g6',"Tu prépares le fianchetto du fou."],
+['Cc3','b1c3',''],['Fg7','f8g7',"Ton fou vise toute la grande diagonale."],['e4','e2e4',"Les Blancs prennent un grand centre."],
+['d6','d7d6',''],['Cf3','g1f3',''],['O-O','e8g8+h8f8',"Ton roi est en sécurité."],
+['Fe2','f1e2',''],['e5','e7e5',"Tu contre-attaques le centre blanc."]]},
+{id:'bu',n:'Gambit Budapest',s:'b',d:"Gambit Budapest contre 1.d4 : un pion offert, un piège de mat.",st:[
+['d4','d2d4',''],['Cf6','g8f6',''],['c4','c2c4',''],['e5','e7e5',"Gambit Budapest : tu offres un pion pour le jeu actif."],
+['dxe5','d4e5',"Les Blancs prennent."],['Cg4','f6g4',"Tu attaques le pion e5."],['Ff4','c1f4',''],
+['Cc6','b8c6',"Deux cavaliers visent e5."],['Cf3','g1f3',''],['Fb4+','f8b4',"Échec !"],
+['Cbd2','b1d2',''],['De7','d8e7',"Tu prépares la reprise en e5."],['a3','a2a3',''],
+['Cgxe5','g4e5',"Tu reprends e5 : menace sur le fou b4."],['axb4??','a3b4',"Les Blancs prennent le fou, mais..."],
+['Cd3#','e5d3',"Mat ! Le roi est coincé par ses propres pièces."]]}
+];
+var cur=0,idx=0,mode='learn',sel=null,hintL=0,tries=0,score=0,msg='',busy=false;
+function $(i){return document.getElementById(i);}
+function mvs(s){return s.split('+').map(function(x){return [x.slice(0,2),x.slice(2,4)];});}
+function O(){return OPS[cur];}
+function lab(i){var s=O().st[i][0];return i%2===0?(i/2+1)+'.'+s:s;}
+function labF(i){var s=O().st[i][0];return (Math.floor(i/2)+1)+(i%2===0?'.':'...')+s;}
+function userTurn(){return mode==='train'&&!busy&&idx<O().st.length&&((idx%2===0)===(O().s==='w'));}
+function pos(){var p=start(),last=[],s=O().st;for(var i=0;i<idx;i++){last=[];mvs(s[i][1]).forEach(function(m){p[m[1]]=p[m[0]];delete p[m[0]];last.push(m[0],m[1]);});}return {p:p,last:last};}
+function draw(){
+var o=O(),r=pos(),f='abcdefgh',h='',flip=o.s==='b',ut=userTurn(),hs=null,hd=null;
+if(ut&&hintL>0){var m0=mvs(o.st[idx][1])[0];hs=m0[0];if(hintL>1)hd=m0[1];}
+for(var y=0;y<8;y++){for(var x=0;x<8;x++){
+var fi=flip?7-x:x,ra=flip?y+1:8-y,s=f[fi]+ra;
+var c=r.last.indexOf(s)>=0?'hl':(((fi+ra)%2===0)?'d':'l');
+if(s===sel)c+=' sel';else if(s===hs||s===hd)c+=' hint';
+var pc=r.p[s],g='';
+if(pc)g='<span class="'+(pc===pc.toUpperCase()?'pw':'pb')+'">'+G[pc.toUpperCase()]+'</span>';
+var lb='';
+if(x===0)lb+='<span class="cn" style="top:2px;left:3px">'+ra+'</span>';
+if(y===7)lb+='<span class="cn" style="bottom:2px;right:3px">'+f[fi]+'</span>';
+h+='<div class="sq '+c+'" onclick="clk(\''+s+'\')">'+lb+g+'</div>';}}
+$('board').innerHTML=h;
+var n=o.st.length,cap='';
+$('info').textContent=o.d;
+if(mode==='learn'){
+cap=idx===0?'<span style="color:var(--tx2)">Position de départ. Appuie sur Suivant pour jouer le premier coup.'+(flip?' Tu joues les Noirs (en bas).':'')+'</span>':'<b>'+labF(idx-1)+'</b><br>'+o.st[idx-1][2];
+}else{
+if(idx>0)cap+='<b>'+labF(idx-1)+'</b> '+o.st[idx-1][2]+'<br>';
+if(idx>=n){cap+='<div style="margin-top:6px;font-weight:500;color:var(--ok)">Ouverture terminée : '+score+' coups trouvés du premier coup sur '+(o.s==='w'?Math.ceil(n/2):Math.floor(n/2))+'.</div>';}
+else if(ut){cap+='<div style="margin-top:6px">À toi de jouer : touche la pièce, puis sa case d\'arrivée.</div>';}
+if(msg)cap+='<div style="margin-top:6px;font-size:14px;color:var(--tx2)">'+msg+'</div>';
+}
+$('cap').innerHTML=cap;
+var m='';
+for(var i=0;i<n;i++){
+if(mode==='train'&&i>=idx)break;
+m+='<span class="mv'+(mode==='learn'?' cl':'')+(i===idx-1?' on':'')+'"'+(mode==='learn'?' onclick="jump('+(i+1)+')"':'')+'>'+lab(i)+'</span> ';}
+$('ml').innerHTML=m;
+}
+function go(d){idx=Math.max(0,Math.min(O().st.length,idx+d));draw();}
+function jump(i){idx=i;draw();}
+function clk(s){
+if(!userTurn())return;
+var o=O(),p=pos().p,pc=p[s],mine=pc&&((pc===pc.toUpperCase())===(o.s==='w'));
+if(sel===null){if(mine){sel=s;hintL=0;draw();}return;}
+if(s===sel){sel=null;draw();return;}
+if(mine){sel=s;draw();return;}
+var exp=mvs(o.st[idx][1])[0];
+if(sel===exp[0]&&s===exp[1]){
+if(tries===0)score++;
+tries=0;hintL=0;sel=null;msg='Bien joué.';idx++;busy=idx<o.st.length;draw();
+if(busy){setTimeout(function(){idx++;busy=false;msg='';draw();},700);}
+}else{tries++;sel=null;msg="Ce n'est pas le coup de l'ouverture. Essaie encore ou demande un indice.";draw();}
+}
+function hintGo(){if(!userTurn())return;hintL++;if(hintL>=3){msg='Le coup est '+O().st[idx][0]+'.';hintL=2;tries=1;}else{msg='';}draw();}
+function restart(){idx=(mode==='train'&&O().s==='b')?1:0;sel=null;hintL=0;tries=0;score=0;msg='';busy=false;draw();}
+function setMode(m){mode=m;$('m-learn').className=m==='learn'?'on':'';$('m-train').className=m==='train'?'on':'';$('c-learn').style.display=m==='learn'?'flex':'none';$('c-train').style.display=m==='train'?'flex':'none';restart();}
+function pick(i){cur=i;restart();chips();}
+function chips(){
+var w='',b='';
+OPS.forEach(function(o,i){var h='<button class="'+(i===cur?'on':'')+'" onclick="pick('+i+')">'+o.n+'</button>';if(o.s==='w')w+=h;else b+=h;});
+$('cw').innerHTML=w;$('cb').innerHTML=b;}
+chips();draw();
+</script>
+</body>
+</html>
