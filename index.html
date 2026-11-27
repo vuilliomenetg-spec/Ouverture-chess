@@ -70,7 +70,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .sheet{position:fixed;inset:0;z-index:60;display:none}
 .sheet.open{display:block}
 .sh-back{position:absolute;inset:0;background:rgba(0,0,0,.6);animation:fadeIn .25s}
-.sh-body{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:82vh;overflow:auto;background:#17201b;border-radius:26px 26px 0 0;border-top:1px solid rgba(232,196,104,.35);padding:10px 18px 26px;animation:slideUp .3s cubic-bezier(.3,.9,.3,1)}
+.sh-body{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;max-height:90vh;overflow:auto;background:#17201b;border-radius:26px 26px 0 0;border-top:1px solid rgba(232,196,104,.35);padding:10px 18px 26px;animation:slideUp .3s cubic-bezier(.3,.9,.3,1)}
 .sh-h{width:44px;height:5px;border-radius:3px;background:#55625a;margin:0 auto 12px}
 .sh-t{font-size:18px;font-weight:700;margin:0 0 14px;text-align:center}
 #info{font-size:14px;color:var(--mute);text-align:center;margin:0}
@@ -122,6 +122,24 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 @keyframes sfill{to{fill:#E8C468;stroke-width:.3}}
 @keyframes sul{to{stroke-dashoffset:0}}
 .sp-s{animation:rise .6s 5.6s both,pulse 1.6s 6.3s infinite!important}
+.pc{display:inline-block;min-width:44px;text-align:center;font-size:12px;font-weight:800;line-height:1;padding:4px 7px;border-radius:999px;margin-left:7px;vertical-align:1px}
+.pc.hi{background:#8fd16a;color:#12310a}.pc.mid{background:#E8C468;color:#2a2210}.pc.lo{background:#f19a8e;color:#3a0f0a}
+.obtn .pc{margin:0 2px 0 0}
+.gsum{margin:-4px 0 16px;text-align:center;font-size:14px;color:var(--mute)}
+.gsum b{color:var(--gold)}
+.rst-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.rst{font:inherit;font-size:13px;font-weight:700;color:#f19a8e;background:transparent;border:2px solid #7a4a44;border-radius:999px;padding:9px 14px;cursor:pointer}
+.rst:active{transform:scale(.96)}
+.dlg{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.65)}
+.dlg.open{display:flex;animation:fadeIn .2s}
+.dlg-b{width:100%;max-width:360px;background:#17201b;border:1px solid rgba(232,196,104,.35);border-radius:26px;padding:22px 20px 18px;text-align:center;animation:popIn .3s cubic-bezier(.3,1.4,.5,1)}
+.dlg-t{font-size:19px;font-weight:700;margin:0 0 8px}
+.dlg-b p{margin:0 0 18px;color:var(--mute);font-size:15px}
+.dlg-a{display:flex;gap:10px}
+.pillbtn{flex:1;font:inherit;font-size:15px;font-weight:700;height:48px;border-radius:999px;border:0;cursor:pointer;background:var(--gold);color:#2a2210}
+.pillbtn.cancel{background:#2d3732;color:var(--ink);border:2px solid #55625a}
+.pillbtn.danger{background:#e0584a;color:#fff}
+.pillbtn:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -139,7 +157,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <button class="mode on" id="m-learn" onclick="setMode('learn')"><i>♟&#xFE0E;</i> Apprendre</button>
 <button class="mode" id="m-train" onclick="setMode('train')"><i>♞&#xFE0E;</i> S'entraîner</button>
 </div>
-<button class="obtn" id="obtn" onclick="openSheet()" aria-label="Choisir une ouverture"><span id="odot" class="dot w"></span><span class="nm" id="oname">Italienne</span><span class="sd" id="oside">Blancs</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<button class="obtn" id="obtn" onclick="openSheet()" aria-label="Choisir une ouverture"><span id="odot" class="dot w"></span><span class="nm" id="oname">Italienne</span><span class="sd" id="oside">Blancs</span><span class="pc" id="opc" style="display:none"></span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
 </div>
 
 <div class="stage">
@@ -165,13 +183,16 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <div class="sh-body">
 <div class="sh-h"></div>
 <p class="sh-t">Choisis une ouverture</p>
+<p class="gsum" id="gsum"></p>
 <p class="gl"><span class="dot w"></span>Avec les Blancs</p>
 <div id="cw" class="chips"></div>
 <p class="gl"><span class="dot b"></span>Avec les Noirs</p>
 <div id="cb" class="chips"></div>
 <div id="info"></div>
+<div class="rst-row"><button class="rst" id="rst1" onclick="askReset(1)"></button><button class="rst" onclick="askReset(0)">Tout remettre à zéro</button></div>
 </div>
 </div>
+<div class="dlg" id="dlg"><div class="dlg-b" role="dialog" aria-modal="true"><p class="dlg-t" id="dlg-t"></p><p id="dlg-p"></p><div class="dlg-a"><button class="pillbtn cancel" id="dlg-c" onclick="dlgClose()">Annuler</button><button class="pillbtn danger" id="dlg-ok"></button></div></div></div>
 <script>
 var G={K:'♚\uFE0E',Q:'♛\uFE0E',R:'♜\uFE0E',B:'♝\uFE0E',N:'♞\uFE0E',P:'♟\uFE0E'};
 function start(){var p={},b='RNBQKBNR',f='abcdefgh';for(var i=0;i<8;i++){p[f[i]+'1']=b[i];p[f[i]+'2']='P';p[f[i]+'7']='p';p[f[i]+'8']=b[i].toLowerCase();}return p;}
@@ -268,6 +289,28 @@ var OPS=[
 ];
 var cur=0,idx=0,mode='learn',sel=null,hintL=0,tries=0,score=0,msg='',busy=false;
 var L={cur:-1,mode:'',idx:-1};
+var KEY='ouvertures-maitrise-v1',M={},runPct=null;
+function loadM(){try{var s=localStorage.getItem(KEY);M=s?JSON.parse(s)||{}:{};}catch(e){M={};}}
+function saveM(){try{localStorage.setItem(KEY,JSON.stringify(M));}catch(e){}}
+function mastery(id){var d=M[id];if(!d||!d.r||!d.r.length)return null;var s=0;d.r.forEach(function(x){s+=x;});return Math.round(s/d.r.length);}
+function pcCls(v){return v>=80?'hi':(v>=50?'mid':'lo');}
+function pcHtml(v){return v===null?'':'<span class="pc '+pcCls(v)+'">'+v+' %</span>';}
+function recordRun(){
+var o=O(),n=o.st.length,total=o.s==='w'?Math.ceil(n/2):Math.floor(n/2),pct=Math.round(100*score/Math.max(1,total));
+var d=M[o.id]||{r:[],n:0};d.r.push(pct);if(d.r.length>5)d.r.shift();d.n=(d.n||0)+1;M[o.id]=d;saveM();runPct=pct;chips();}
+function dlg(t,p,ok,fn,single){$('dlg-t').textContent=t;$('dlg-p').textContent=p;var b=$('dlg-ok');b.textContent=ok;b.onclick=function(){dlgClose();if(fn)fn();};b.className='pillbtn'+(single?'':' danger');$('dlg-c').style.display=single?'none':'';$('dlg').className='dlg open';}
+function dlgClose(){$('dlg').className='dlg';}
+function askReset(one){
+if(one){var o=O(),v=mastery(o.id);
+if(v===null){dlg('Rien à remettre à zéro','« '+o.n+' » n\'a pas encore de note.','OK',null,true);return;}
+dlg('Remettre à zéro ?','Ta maîtrise de « '+o.n+' » ('+v+' %) sera effacée. Cette action est définitive.','Remettre à zéro',function(){delete M[o.id];saveM();runPct=null;chips();draw();});
+}else{
+var any=OPS.some(function(x){return mastery(x.id)!==null;});
+if(!any){dlg('Rien à remettre à zéro','Aucune ouverture n\'a encore de note.','OK',null,true);return;}
+dlg('Tout remettre à zéro ?','Les notes de maîtrise de toutes les ouvertures seront effacées. Cette action est définitive.','Tout effacer',function(){M={};saveM();runPct=null;chips();draw();});}
+}
+loadM();
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 function replay(el,c){el.classList.remove(c);void el.offsetWidth;el.classList.add(c);}
 function hideSplash(){var s=$('splash');if(!s||s.className==='out')return;s.className='out';setTimeout(function(){s.style.display='none';},700);}
@@ -308,6 +351,7 @@ if(y===7)lb+='<span class="cn" style="bottom:2px;right:3px">'+f[fi]+'</span>';
 h+='<div class="sq '+c+'" data-sq="'+s+'" onclick="clk(\''+s+'\')">'+lb+g+'</div>';}}
 $('board').innerHTML=h;
 var same=(L.cur===cur&&L.mode===mode),anim=same&&idx===L.idx+1&&!RM;
+if(mode==='train'&&idx>=o.st.length&&!(same&&L.idx>=o.st.length))recordRun();
 if(anim)slide(r,flip);
 var n=o.st.length,cap='';
 $('info').textContent=o.d;
@@ -315,7 +359,7 @@ if(mode==='learn'){
 cap=idx===0?'<span style="color:var(--mute)">'+o.d+(flip?' Tu joues les Noirs (en bas).':'')+' Appuie sur la flèche pour commencer.</span>':'<b>'+labF(idx-1)+'</b><br>'+o.st[idx-1][2];
 }else{
 if(idx>0)cap+='<b>'+labF(idx-1)+'</b> '+o.st[idx-1][2]+'<br>';
-if(idx>=n){cap+='<div class="ok" style="margin-top:6px">Ouverture terminée : '+score+' coups trouvés du premier coup sur '+(o.s==='w'?Math.ceil(n/2):Math.floor(n/2))+'.</div>';}
+if(idx>=n){cap+='<div class="ok" style="margin-top:6px">Terminé : '+score+' coups trouvés du premier coup sur '+(o.s==='w'?Math.ceil(n/2):Math.floor(n/2))+' ('+runPct+' %). Maîtrise : '+mastery(o.id)+' %.</div>';}
 else if(ut){cap+='<div style="margin-top:6px">À toi de jouer : touche la pièce, puis sa case d\'arrivée.</div>';}
 if(msg)cap+='<div style="margin-top:6px;font-size:14px;color:var(--mute)">'+msg+'</div>';
 }
@@ -344,14 +388,18 @@ tries=0;hintL=0;sel=null;msg='Bien joué.';idx++;busy=idx<o.st.length;draw();
 if(busy){setTimeout(function(){idx++;busy=false;msg='';draw();},700);}
 }else{tries++;sel=null;msg="Ce n'est pas le coup de l'ouverture. Essaie encore ou demande un indice.";draw();replay($('frame'),'shake');if(navigator.vibrate)navigator.vibrate(60);}
 }
-function hintGo(){if(!userTurn())return;hintL++;if(hintL>=3){msg='Le coup est '+O().st[idx][0]+'.';hintL=2;tries=1;}else{msg='';}draw();}
-function restart(){idx=(mode==='train'&&O().s==='b')?1:0;sel=null;hintL=0;tries=0;score=0;msg='';busy=false;draw();}
+function hintGo(){if(!userTurn())return;hintL++;tries=1;if(hintL>=3){msg='Le coup est '+O().st[idx][0]+'.';hintL=2;tries=1;}else{msg='';}draw();}
+function restart(){runPct=null;idx=(mode==='train'&&O().s==='b')?1:0;sel=null;hintL=0;tries=0;score=0;msg='';busy=false;draw();}
 function setMode(m){mode=m;$('m-learn').className='mode'+(m==='learn'?' on':'');$('m-train').className='mode'+(m==='train'?' on':'');$('c-learn').style.display=m==='learn'?'flex':'none';$('c-train').style.display=m==='train'?'flex':'none';restart();replay($('frame'),'pop');}
 function pick(i){cur=i;closeSheet();restart();chips();replay($('frame'),'pop');}
 function chips(){
 var w='',b='';
-OPS.forEach(function(o,i){var h='<button class="chip '+o.s+(i===cur?' on':'')+'" onclick="pick('+i+')">'+o.n+'</button>';if(o.s==='w')w+=h;else b+=h;});
-$('cw').innerHTML=w;$('cb').innerHTML=b;var c=OPS[cur];$('oname').textContent=c.n;$('oside').textContent=c.s==='w'?'Blancs':'Noirs';$('odot').className='dot '+c.s;$('info').textContent=c.d;}
+OPS.forEach(function(o,i){var h='<button class="chip '+o.s+(i===cur?' on':'')+'" onclick="pick('+i+')">'+o.n+pcHtml(mastery(o.id))+'</button>';if(o.s==='w')w+=h;else b+=h;});
+$('cw').innerHTML=w;$('cb').innerHTML=b;var c=OPS[cur];$('oname').textContent=c.n;$('oside').textContent=c.s==='w'?'Blancs':'Noirs';$('odot').className='dot '+c.s;var v=mastery(c.id),tot=0,k=0;OPS.forEach(function(x){var m=mastery(x.id);if(m!==null){tot+=m;k++;}});
+var op=$('opc');op.style.display=v===null?'none':'';op.className='pc '+(v===null?'':pcCls(v));op.textContent=v===null?'':v+' %';
+$('gsum').innerHTML=k?'Maîtrise globale : <b>'+Math.round(tot/k)+' %</b> · '+k+'/'+OPS.length+' ouvertures testées':'Entraîne-toi pour voir ta maîtrise de chaque ouverture';
+$('info').textContent=c.d+(v===null?'':' — Maîtrise '+v+' % sur '+Math.min(5,M[c.id].r.length)+' dernière'+(M[c.id].r.length>1?'s':'')+' partie'+(M[c.id].r.length>1?'s':'')+'.');
+$('rst1').textContent='Remettre à zéro « '+c.n+' »';}
 function openSheet(){$('sheet').className='sheet open';}
 function closeSheet(){$('sheet').className='sheet';}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mode,.chip,.rb,.pill');if(!b||RM)return;var r=b.getBoundingClientRect(),s=document.createElement('span'),d=Math.max(r.width,r.height)*1.6;s.className='rp';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(function(){s.remove();},650);});
