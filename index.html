@@ -253,6 +253,25 @@ body{box-sizing:border-box;height:100vh;height:100dvh}
 .lvb{display:flex;align-items:center;gap:14px;height:48px;padding:0 18px;border-radius:14px;border:1.5px solid #8a7547;background:rgba(13,18,30,.8);color:var(--ink);font:inherit;font-size:15px;cursor:pointer}
 .lvb b{font-family:var(--serif);font-size:22px;color:var(--gold);min-width:56px;text-align:left}
 .lvb.on{background:linear-gradient(180deg,#F6EBCB,#C9A96A);color:#2a2112;border-color:#F3E6C4}.lvb.on b{color:#2a2112}
+.trow{display:flex;gap:8px;width:100%}.trow .dtop{flex:1}
+.qbtn{width:34px;height:34px;flex:none;border-radius:50%;border:1.5px solid var(--gold);background:rgba(13,18,30,.85);color:var(--gold);font:700 19px var(--serif);cursor:pointer;padding:0}
+.qbtn:active{transform:scale(.94)}
+#tuto{position:fixed;inset:0;z-index:900;display:none}#tuto.on{display:block}
+.tblk{position:absolute;inset:0;background:rgba(5,8,14,.28)}
+.tf{position:fixed;left:0;top:0;width:48px;height:48px;border-radius:50%;pointer-events:none;transition:transform .9s cubic-bezier(.5,0,.2,1);background:radial-gradient(circle,rgba(243,230,196,.95) 0 28%,rgba(217,190,138,.45) 30% 62%,rgba(217,190,138,0) 64%);box-shadow:0 0 22px rgba(217,190,138,.7);z-index:2}
+.tf::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:3px solid #F3E6C4;opacity:0}
+.tf.tap{animation:tfd .6s}.tf.tap::after{animation:tfr .6s ease-out}
+@keyframes tfd{0%,100%{filter:none}30%{filter:brightness(.8) saturate(1.3)}}
+@keyframes tfr{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(2.2)}}
+.tb{position:fixed;left:50%;width:min(92vw,440px);box-sizing:border-box;margin-left:calc(min(92vw,440px)/-2);padding:14px 16px 12px;border-radius:24px;background:#0e1320;border:1.5px solid var(--gold);box-shadow:0 12px 34px rgba(0,0,0,.7);z-index:3;color:var(--ink);font-size:16px;line-height:1.4}
+.tb.bot{bottom:calc(14px + env(safe-area-inset-bottom));top:auto}.tb.top{top:calc(14px + env(safe-area-inset-top));bottom:auto}
+.tbh{display:flex;gap:10px;align-items:flex-start}.tbh i{font-style:normal;font-size:26px;line-height:1;color:var(--gold);flex:none}
+.tdots{display:flex;gap:6px;justify-content:center;margin:10px 0 8px}.tdots u{width:7px;height:7px;border-radius:50%;background:#3b4560}.tdots u.on{background:var(--gold);box-shadow:0 0 8px rgba(217,190,138,.8)}
+.tbr{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tck{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mute);cursor:pointer}.tck input{width:20px;height:20px;accent-color:#D9BE8A}
+#tskip{font:inherit;font-size:14px;font-weight:700;border:1.5px solid #8a7547;background:transparent;color:var(--gold);border-radius:999px;padding:8px 16px;cursor:pointer}
+#tskip.done{background:linear-gradient(180deg,#F6EBCB,#C9A96A);color:#2a2112;border-color:#F3E6C4}
+.tpop{animation:popIn .35s}
 </style>
 </head>
 <body>
@@ -266,7 +285,7 @@ body{box-sizing:border-box;height:100vh;height:100dvh}
 </div>
 <div class="app">
 <div class="top">
-<button class="dtop" onclick="openDon()"><svg viewBox="0 0 24 24"><path d="M12 20.5C5 15.2 3 12 3 8.9 3 6.3 5 4.5 7.3 4.5c1.9 0 3.6 1 4.7 2.7 1.1-1.7 2.8-2.7 4.7-2.7C19 4.5 21 6.3 21 8.9c0 3.1-2 6.3-9 11.6z"/></svg>Faire un don avec PayPal</button>
+<div class="trow"><button class="dtop" onclick="openDon()"><svg viewBox="0 0 24 24"><path d="M12 20.5C5 15.2 3 12 3 8.9 3 6.3 5 4.5 7.3 4.5c1.9 0 3.6 1 4.7 2.7 1.1-1.7 2.8-2.7 4.7-2.7C19 4.5 21 6.3 21 8.9c0 3.1-2 6.3-9 11.6z"/></svg>Faire un don avec PayPal</button><button class="qbtn" onclick="tutoStart()" aria-label="Revoir le tutoriel">?</button></div>
 <div class="modes">
 <button class="mode on" id="m-learn" onclick="setMode('learn')"><i>♟&#xFE0E;</i> Apprendre</button>
 <button class="mode" id="m-train" onclick="setMode('train')"><i>♞&#xFE0E;</i> S'entraîner</button>
@@ -308,7 +327,7 @@ body{box-sizing:border-box;height:100vh;height:100dvh}
 <div id="cb" class="chips"></div>
 <div id="info"></div>
 <div class="rst-row"><button class="rst" id="rst1" onclick="askReset(1)"></button><button class="rst" onclick="askReset(0)">Tout remettre à zéro</button></div>
-<p class="ver">Version 14</p>
+<p class="ver">Version 15</p>
 </div>
 </div>
 <div class="sheet" id="lsheet">
@@ -339,6 +358,7 @@ body{box-sizing:border-box;height:100vh;height:100dvh}
 <p class="leg" id="tleg"></p>
 </div>
 </div>
+<div id="tuto"><div class="tblk"></div><div id="tf" class="tf"></div><div id="tb" class="tb"><div class="tbh"><i>♞&#xFE0E;</i><span id="tt"></span></div><div class="tdots" id="td"></div><div class="tbr"><label class="tck"><input type="checkbox" id="tck" onchange="tChk(this.checked)"><span>Ne plus afficher au démarrage</span></label><button id="tskip" onclick="tutoStop()">Passer</button></div></div></div>
 <div class="dlg" id="dlg"><div class="dlg-b" role="dialog" aria-modal="true"><p class="dlg-t" id="dlg-t"></p><p id="dlg-p"></p><div class="dlg-a"><button class="pillbtn cancel" id="dlg-c" onclick="dlgClose()">Annuler</button><button class="pillbtn danger" id="dlg-ok"></button></div></div></div>
 <script>
 var G={K:'♚\uFE0E',Q:'♛\uFE0E',R:'♜\uFE0E',B:'♝\uFE0E',N:'♞\uFE0E',P:'♟\uFE0E'};
@@ -460,7 +480,7 @@ loadM();
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 var RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 function replay(el,c){el.classList.remove(c);void el.offsetWidth;el.classList.add(c);}
-function hideSplash(){var s=$('splash');if(!s||s.className==='out')return;s.className='out';setTimeout(function(){s.style.display='none';},700);}
+function hideSplash(){var s=$('splash');if(!s||s.className==='out')return;s.className='out';setTimeout(function(){s.style.display='none';},700);if(!tOff())setTimeout(tutoStart,900);}
 function confetti(){if(RM)return;var cols=['#D9BE8A','#F3E6C4','#8a7547','#ECE6D6'];for(var i=0;i<34;i++){var d=document.createElement('div');d.className='cf';var w=6+Math.random()*7;d.style.cssText='left:'+Math.random()*100+'vw;width:'+w+'px;height:'+(w*1.5)+'px;background:'+cols[i%4]+';--r:'+(Math.random()*720-360)+'deg;animation-duration:'+(1.4+Math.random()*1.4)+'s;animation-delay:'+Math.random()*.4+'s';document.body.appendChild(d);(function(x){setTimeout(function(){x.remove();},3400);})(d);}}
 function slide(r,flip){
 var b=$('board'),cell=b.firstChild?b.firstChild.offsetWidth:0;if(!cell)return;
@@ -699,6 +719,41 @@ var m='';g.hist.forEach(function(k,j){m+='<span class="mv'+(k.tag==='ok'?' gok':
 $('ml').innerHTML=m;$('ml').scrollLeft=$('ml').scrollWidth;
 $('info').textContent=o.d+(av!==null?' — Parties libres : moyenne '+av+' %.':'');L={cur:cur,mode:mode,idx:-1};}
 loadP();
+
+/* ===== Tutoriel animé ===== */
+var TK='ouvertures-tuto-v1',tt=0,tOn=false,tOm='learn',tOc=0;
+function tOff(){try{return localStorage.getItem(TK)==='off';}catch(e){return false;}}
+function tChk(c){try{if(c)localStorage.setItem(TK,'off');else localStorage.removeItem(TK);}catch(e){}}
+function tWait(ms,k){return new Promise(function(res,rej){setTimeout(function(){if(k===tt)res();else rej('x');},ms);});}
+function tEl(x){return typeof x==='string'?document.querySelector(x):x;}
+function tSay(txt,n,sel){var e=tEl(sel),b=$('tb'),y=0;if(e){var r=e.getBoundingClientRect();y=r.top+r.height/2;}
+b.className='tb '+(y>innerHeight*.55?'top':'bot');$('tt').innerHTML=txt;replay(b,'tpop');
+var d='';for(var i=1;i<=7;i++)d+='<u'+(i===n?' class="on"':'')+'></u>';$('td').innerHTML=d;}
+async function tMove(sel,k){var e=tEl(sel);if(!e)return;var r=e.getBoundingClientRect();$('tf').style.transform='translate('+(r.left+r.width/2-24)+'px,'+(r.top+r.height/2-24)+'px)';await tWait(950,k);}
+async function tTap(fn,k){var f=$('tf');f.classList.add('tap');await tWait(220,k);if(fn)fn();await tWait(380,k);f.classList.remove('tap');}
+async function tUser(k){var o=O(),e=mvs(o.st[idx][1])[0];
+await tMove('[data-sq="'+e[0]+'"]',k);await tTap(function(){clk(e[0]);},k);
+await tMove('[data-sq="'+e[1]+'"]',k);await tTap(function(){clk(e[1]);},k);await tWait(1300,k);}
+async function tutoRun(k){try{
+$('tf').style.transform='translate('+(innerWidth/2-24)+'px,'+(innerHeight+40)+'px)';
+setMode('learn');pick(0);
+tSay('👋 <b>Bienvenue !</b> Voici en 40 secondes comment progresser aux échecs avec cette appli.',1,null);await tWait(3200,k);
+tSay('<b>1. Apprendre</b> : on découvre une ouverture, coup par coup.',2,'#m-learn');await tMove('#m-learn',k);await tTap(function(){setMode('learn');},k);await tWait(1400,k);
+tSay('On choisit l\'ouverture voulue dans la liste.',2,'#obtn');await tMove('#obtn',k);await tTap(openSheet,k);await tWait(700,k);
+tSay('Par exemple l\'<b>Italienne</b>.',2,'#cw .chip');await tMove('#cw .chip',k);await tTap(function(){pick(0);},k);await tWait(900,k);
+tSay('On appuie sur <b>▶</b> : les pièces avancent et chaque coup est expliqué.',3,'.rb.main');await tMove('.rb.main',k);
+for(var i=0;i<4;i++){await tTap(function(){go(1);},k);await tWait(700,k);}
+tSay('<b>2. S\'entraîner</b> : on rejoue de mémoire ce qu\'on a appris.',4,'#m-train');await tMove('#m-train',k);await tTap(function(){setMode('train');},k);await tWait(1200,k);
+tSay('Je touche la pièce, puis sa case d\'arrivée…',4,'[data-sq="e2"]');await tUser(k);
+tSay('Bien joué ! Chaque coup trouvé du premier coup fait monter ta maîtrise.',4,'[data-sq="e2"]');await tUser(k);await tWait(900,k);
+tSay('<b>3. Maîtrise</b> : ce bouton montre ton score en % pour chaque ouverture.',5,'.tbtn');await tMove('.tbtn',k);await tTap(openTable,k);await tWait(900,k);
+tSay('Vert : maîtrisée · Orange : en progrès · Rouge : à travailler. Tout est mémorisé.',5,'#mlist');await tWait(4200,k);
+closeTable();await tWait(700,k);
+tSay('<b>4. Partie</b> : joue une vraie partie contre l\'ordinateur (niveau en Elo au choix) et reçois une note sur ton ouverture.',6,'#m-game');await tMove('#m-game',k);await tWait(4200,k);
+tSay('C\'est parti ! Le bouton <b>?</b> en haut te permet de revoir ce tutoriel.',7,'.qbtn');await tMove('.qbtn',k);$('tskip').textContent='Terminer';$('tskip').className='done';
+}catch(e){}}
+function tutoStart(){if(tOn)return;tOn=true;tt++;tOm=mode;tOc=cur;$('tck').checked=tOff();$('tskip').textContent='Passer';$('tskip').className='';$('tuto').className='on';tutoRun(tt);}
+function tutoStop(){tt++;tOn=false;$('tuto').className='';closeSheet();closeTable();closeDon();closeLv();cur=tOc;setMode(tOm);chips();}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mode,.chip,.rb,.pill');if(!b||RM)return;var r=b.getBoundingClientRect(),s=document.createElement('span'),d=Math.max(r.width,r.height)*1.6;s.className='rp';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(function(){s.remove();},650);});
 chips();draw();
 setTimeout(hideSplash,RM?0:8000);
