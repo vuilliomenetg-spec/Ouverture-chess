@@ -173,6 +173,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .st{width:76px;flex:none;text-align:center;font-size:10.5px;font-weight:800;padding:4px 0;border-radius:999px;white-space:nowrap}
 .st.hi{background:#8fd16a;color:#12310a}.st.mid{background:#E8C468;color:#2a2210}.st.lo{background:#f19a8e;color:#3a0f0a}.st.no{background:#3a4640;color:var(--mute)}
 .leg{margin:8px 2px 0;font-size:11px;color:var(--mute);line-height:1.4;text-align:center}
+.ver{margin:12px 0 0;text-align:center;font-size:11px;color:#6f7b74}
 </style>
 </head>
 <body>
@@ -223,6 +224,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <div id="cb" class="chips"></div>
 <div id="info"></div>
 <div class="rst-row"><button class="rst" id="rst1" onclick="askReset(1)"></button><button class="rst" onclick="askReset(0)">Tout remettre à zéro</button></div>
+<p class="ver">Version 9</p>
 </div>
 </div>
 <div class="sheet" id="tsheet">
@@ -466,7 +468,9 @@ function closeSheet(){$('sheet').className='sheet';}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mode,.chip,.rb,.pill');if(!b||RM)return;var r=b.getBoundingClientRect(),s=document.createElement('span'),d=Math.max(r.width,r.height)*1.6;s.className='rp';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(function(){s.remove();},650);});
 chips();draw();
 setTimeout(hideSplash,RM?0:8000);
-if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+if('serviceWorker' in navigator){var hadSW=!!navigator.serviceWorker.controller;
+navigator.serviceWorker.addEventListener('controllerchange',function(){if(hadSW&&!window.__rl){window.__rl=1;location.reload();}});
+window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').then(function(r){r.update();}).catch(function(){});});}
 </script>
 </body>
 </html>
