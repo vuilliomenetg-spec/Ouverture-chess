@@ -12,8 +12,8 @@
 <title>Ouvertures d'échecs</title>
 <style>
 html{background:#1b2420}
-:root{--gold:#E8C468;--ink:#efeee9;--mute:#aab5ae;--panel:rgba(18,26,22,.86);--cell:max(28px,calc(min(92vw - 20px,100vh - 400px,460px)/8))}
-@supports(height:100dvh){:root{--cell:max(28px,calc(min(92vw - 20px,100dvh - 400px,460px)/8))}}
+:root{--gold:#E8C468;--ink:#efeee9;--mute:#aab5ae;--panel:rgba(18,26,22,.86);--cell:max(28px,calc(min(92vw - 20px,100vh - 380px,460px)/8))}
+@supports(height:100dvh){:root{--cell:max(28px,calc(min(92vw - 20px,100dvh - 380px,460px)/8))}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4;padding:max(10px,env(safe-area-inset-top)) 10px 10px}
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 0%,rgba(0,0,0,0) 0%,rgba(0,0,0,.6) 100%),conic-gradient(#2a3a32 25%,#1b2621 0 50%,#2a3a32 0 75%,#1b2621 0) 0 0/88px 88px}
@@ -24,7 +24,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .mode i{font-style:normal;font-size:21px;line-height:1}
 .mode:active{transform:scale(.97)}
 .mode.on{background:var(--gold);color:#2a2210;box-shadow:0 6px 18px rgba(232,196,104,.3)}
-.obtn{width:100%;height:46px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:999px;background:rgba(18,26,22,.8);color:var(--ink);border:2px solid #55625a;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.obtn{flex:1;min-width:0;height:46px;display:flex;align-items:center;gap:10px;padding:0 16px;border-radius:999px;background:rgba(18,26,22,.8);color:var(--ink);border:2px solid #55625a;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 .obtn .nm{flex:1;text-align:left}
 .obtn .sd{font-size:12px;font-weight:500;color:var(--mute)}
 .obtn svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -75,12 +75,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .sh-t{font-size:18px;font-weight:700;margin:0 0 14px;text-align:center}
 #info{font-size:14px;color:var(--mute);text-align:center;margin:0}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+@media(max-height:700px){.mr{height:30px}.sum b{font-size:16px}.leg{display:none}#tsheet .sh-h{margin-bottom:6px}}
 @media(min-width:760px) and (min-aspect-ratio:5/4){
 :root{--cell:max(30px,min(calc((100vh - 120px)/8),66px))}
 .app{max-width:1000px}
 .top{flex-direction:row}
 .modes{flex:1.3}
-.obtn{flex:1;width:auto}
+.orow{flex:1}
 .stage{flex-direction:row;align-items:flex-start;gap:18px}
 .side{width:340px}
 #cap{height:auto;min-height:110px}
@@ -140,34 +141,38 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .pillbtn.cancel{background:#2d3732;color:var(--ink);border:2px solid #55625a}
 .pillbtn.danger{background:#e0584a;color:#fff}
 .pillbtn:active{transform:scale(.96)}
-.more{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;margin-top:2px;padding:2px 0;background:none;border:0;font:inherit;font-size:13px;font-weight:700;color:var(--gold);cursor:pointer}
-.more svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.tbl{width:100%;margin-top:8px;padding:14px}
-.tbl-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;flex-wrap:wrap}
-.tbl-t{font-size:18px;font-weight:700;margin:0}
+.orow{display:flex;gap:8px;width:100%}
+.tbtn{width:46px;height:46px;flex:none;border-radius:50%;background:rgba(18,26,22,.8);border:2px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;position:relative;overflow:hidden;transition:transform .12s}
+.tbtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tbtn:active{transform:scale(.92)}
+#tsheet{z-index:62}
+#tsheet .sh-body{max-height:96vh;padding:8px 14px 16px}
+#tsheet .sh-h{margin-bottom:8px}
+.th{display:flex;align-items:center;gap:8px;margin:0 0 8px}
+.tt{flex:1;font-size:18px;font-weight:700;margin:0}
 .seg{display:flex;background:#2d3732;border-radius:999px;padding:3px}
-.seg button{font:inherit;font-size:12px;font-weight:700;color:var(--mute);background:none;border:0;border-radius:999px;padding:6px 12px;cursor:pointer}
+.seg button{font:inherit;font-size:12px;font-weight:700;color:var(--mute);background:none;border:0;border-radius:999px;padding:6px 11px;cursor:pointer}
 .seg button.on{background:var(--gold);color:#2a2210}
-.sum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px}
-.sum div{text-align:center;border-radius:14px;padding:8px 2px;background:rgba(255,255,255,.06);font-size:11px;color:var(--mute);line-height:1.2}
-.sum b{display:block;font-size:22px;color:var(--ink)}
+.xb{width:36px;height:36px;flex:none;border-radius:50%;background:#2d3732;border:2px solid #55625a;color:var(--ink);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.xb svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round}
+.sum{display:flex;gap:6px;margin:0 0 8px}
+.sum div{flex:1;text-align:center;border-radius:12px;padding:5px 2px;background:rgba(255,255,255,.06);font-size:10.5px;color:var(--mute);line-height:1.15}
+.sum b{display:block;font-size:18px;color:var(--ink);line-height:1.1}
 .sum .hi b{color:#8fd16a}.sum .mid b{color:#E8C468}.sum .lo b{color:#f19a8e}
-.mlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:8px}
-.mr{background:rgba(255,255,255,.05);border-radius:16px;padding:10px 12px;cursor:pointer;border:1.5px solid transparent;transition:transform .12s}
-.mr:active{transform:scale(.98)}
+.mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.mr{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:12px;background:rgba(255,255,255,.05);cursor:pointer;border:1.5px solid transparent}
+.mr:active{background:rgba(255,255,255,.1)}
 .mr.cur{border-color:var(--gold)}
-.mr-t{display:flex;align-items:center;gap:8px}
-.mr-n{flex:1;font-weight:700;font-size:15px}
-.st{font-size:11px;font-weight:800;padding:4px 9px;border-radius:999px;white-space:nowrap}
-.st.hi{background:#8fd16a;color:#12310a}.st.mid{background:#E8C468;color:#2a2210}.st.lo{background:#f19a8e;color:#3a0f0a}.st.no{background:#3a4640;color:var(--mute)}
-.mr-b{display:flex;align-items:center;gap:8px;margin-top:8px}
-.bar{flex:1;height:10px;border-radius:999px;background:rgba(255,255,255,.1);overflow:hidden}
+.mr .dot{width:12px;height:12px}
+.mr-n{flex:1;min-width:0;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{width:52px;height:8px;border-radius:999px;background:rgba(255,255,255,.12);overflow:hidden;flex:none}
 .bar i{display:block;height:100%;border-radius:999px;animation:grow .8s cubic-bezier(.3,.9,.3,1)}
 .bar i.hi{background:#8fd16a}.bar i.mid{background:#E8C468}.bar i.lo{background:#f19a8e}
 @keyframes grow{from{width:0!important}}
-.mr-p{font-size:14px;font-weight:800;min-width:46px;text-align:right}
-.mr-c{font-size:12px;color:var(--mute);min-width:60px;text-align:right}
-.leg{margin:12px 2px 2px;font-size:12px;color:var(--mute);line-height:1.5}
+.mr-p{width:40px;text-align:right;font-size:13px;font-weight:800;flex:none}
+.st{width:76px;flex:none;text-align:center;font-size:10.5px;font-weight:800;padding:4px 0;border-radius:999px;white-space:nowrap}
+.st.hi{background:#8fd16a;color:#12310a}.st.mid{background:#E8C468;color:#2a2210}.st.lo{background:#f19a8e;color:#3a0f0a}.st.no{background:#3a4640;color:var(--mute)}
+.leg{margin:8px 2px 0;font-size:11px;color:var(--mute);line-height:1.4;text-align:center}
 </style>
 </head>
 <body>
@@ -185,7 +190,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <button class="mode on" id="m-learn" onclick="setMode('learn')"><i>♟&#xFE0E;</i> Apprendre</button>
 <button class="mode" id="m-train" onclick="setMode('train')"><i>♞&#xFE0E;</i> S'entraîner</button>
 </div>
-<button class="obtn" id="obtn" onclick="openSheet()" aria-label="Choisir une ouverture"><span id="odot" class="dot w"></span><span class="nm" id="oname">Italienne</span><span class="sd" id="oside">Blancs</span><span class="pc" id="opc" style="display:none"></span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="orow"><button class="obtn" id="obtn" onclick="openSheet()" aria-label="Choisir une ouverture"><span id="odot" class="dot w"></span><span class="nm" id="oname">Italienne</span><span class="sd" id="oside">Blancs</span><span class="pc" id="opc" style="display:none"></span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><button class="tbtn" onclick="openTable()" aria-label="Tableau de maîtrise"><svg viewBox="0 0 24 24"><path d="M6 20v-7M12 20V5M18 20v-10"/></svg></button></div>
 </div>
 
 <div class="stage">
@@ -202,16 +207,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <button class="rb" onclick="restart()" aria-label="Recommencer"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v5h5"/></svg></button>
 </div>
 <div id="ml"></div>
-<button class="more" onclick="scrollTable()">Tableau de maîtrise <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
 </div>
 </div>
-<section class="card tbl" id="tbl">
-<div class="tbl-h"><h2 class="tbl-t">Tableau de maîtrise</h2>
-<div class="seg"><button id="sg-l" class="on" onclick="setSort('liste')">Liste</button><button id="sg-n" onclick="setSort('note')">À travailler d'abord</button></div></div>
-<div class="sum" id="tsum"></div>
-<ul class="mlist" id="mlist"></ul>
-<p class="leg">Maîtrisée : 80 % et plus · En progrès : 50 à 79 % · À travailler : moins de 50 % · À tester : pas encore d'entraînement. La note est la moyenne de tes 5 dernières parties d'entraînement. Touche une ligne pour t'entraîner sur cette ouverture.</p>
-</section>
 </div>
 
 <div class="sheet" id="sheet">
@@ -226,6 +223,18 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 <div id="cb" class="chips"></div>
 <div id="info"></div>
 <div class="rst-row"><button class="rst" id="rst1" onclick="askReset(1)"></button><button class="rst" onclick="askReset(0)">Tout remettre à zéro</button></div>
+</div>
+</div>
+<div class="sheet" id="tsheet">
+<div class="sh-back" onclick="closeTable()"></div>
+<div class="sh-body">
+<div class="sh-h"></div>
+<div class="th"><h2 class="tt">Maîtrise</h2>
+<div class="seg"><button id="sg-l" class="on" onclick="setSort('liste')">Liste</button><button id="sg-n" onclick="setSort('note')">Tri par note</button></div>
+<button class="xb" onclick="closeTable()" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+<div class="sum" id="tsum"></div>
+<ul class="mlist" id="mlist"></ul>
+<p class="leg" id="tleg"></p>
 </div>
 </div>
 <div class="dlg" id="dlg"><div class="dlg-b" role="dialog" aria-modal="true"><p class="dlg-t" id="dlg-t"></p><p id="dlg-p"></p><div class="dlg-a"><button class="pillbtn cancel" id="dlg-c" onclick="dlgClose()">Annuler</button><button class="pillbtn danger" id="dlg-ok"></button></div></div></div>
@@ -439,17 +448,19 @@ $('rst1').textContent='Remettre à zéro « '+c.n+' »';renderTable();}
 var sortMode='liste';
 function stOf(v){return v===null?['no','À tester']:(v>=80?['hi','Maîtrisée']:(v>=50?['mid','En progrès']:['lo','À travailler']));}
 function renderTable(){
-var cnt={hi:0,mid:0,lo:0,no:0},it=OPS.map(function(o,i){var v=mastery(o.id),s=stOf(v);cnt[s[0]]++;return {o:o,i:i,v:v,s:s};});
+var cnt={hi:0,mid:0,lo:0,no:0},games=0,it=OPS.map(function(o,i){var v=mastery(o.id),s=stOf(v);cnt[s[0]]++;if(M[o.id])games+=M[o.id].n||0;return {o:o,i:i,v:v,s:s};});
 if(sortMode==='note')it.sort(function(a,b){return (a.v===null?-1:a.v)-(b.v===null?-1:b.v)||a.i-b.i;});
 var rows='';
-it.forEach(function(x){var n=M[x.o.id]?M[x.o.id].n:0;
-rows+='<li class="mr'+(x.i===cur?' cur':'')+'" onclick="goTo('+x.i+')"><div class="mr-t"><span class="dot '+x.o.s+'"></span><span class="mr-n">'+x.o.n+'</span><span class="st '+x.s[0]+'">'+x.s[1]+'</span></div><div class="mr-b"><div class="bar">'+(x.v===null?'':'<i class="'+x.s[0]+'" style="width:'+x.v+'%"></i>')+'</div><span class="mr-p">'+(x.v===null?'—':x.v+' %')+'</span><span class="mr-c">'+(n?n+' partie'+(n>1?'s':''):'')+'</span></div></li>';});
+it.forEach(function(x){
+rows+='<li class="mr'+(x.i===cur?' cur':'')+'" onclick="goTo('+x.i+')"><span class="dot '+x.o.s+'"></span><span class="mr-n">'+x.o.n+'</span><div class="bar">'+(x.v===null?'':'<i class="'+x.s[0]+'" style="width:'+x.v+'%"></i>')+'</div><span class="mr-p">'+(x.v===null?'—':x.v+' %')+'</span><span class="st '+x.s[0]+'">'+x.s[1]+'</span></li>';});
 $('mlist').innerHTML=rows;
 $('tsum').innerHTML='<div class="hi"><b>'+cnt.hi+'</b>Maîtrisées</div><div class="mid"><b>'+cnt.mid+'</b>En progrès</div><div class="lo"><b>'+cnt.lo+'</b>À travailler</div><div><b>'+cnt.no+'</b>À tester</div>';
+$('tleg').textContent='Maîtrisée ≥ 80 % · En progrès 50-79 % · À travailler < 50 %. Moyenne des 5 dernières parties'+(games?' · '+games+' partie'+(games>1?'s':'')+' jouée'+(games>1?'s':''):'')+'.';
 $('sg-l').className=sortMode==='liste'?'on':'';$('sg-n').className=sortMode==='note'?'on':'';}
 function setSort(s){sortMode=s;renderTable();}
-function goTo(i){pick(i);window.scrollTo({top:0,behavior:RM?'auto':'smooth'});}
-function scrollTable(){$('tbl').scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});}
+function goTo(i){closeTable();pick(i);}
+function openTable(){renderTable();$('tsheet').className='sheet open';}
+function closeTable(){$('tsheet').className='sheet';}
 function openSheet(){$('sheet').className='sheet open';}
 function closeSheet(){$('sheet').className='sheet';}
 document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.mode,.chip,.rb,.pill');if(!b||RM)return;var r=b.getBoundingClientRect(),s=document.createElement('span'),d=Math.max(r.width,r.height)*1.6;s.className='rp';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(function(){s.remove();},650);});
