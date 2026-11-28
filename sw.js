@@ -1,4 +1,4 @@
-const CACHE='ouvertures-v15';
+const CACHE='ouvertures-v16';
 const FILES=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>Promise.all(FILES.map(f=>
